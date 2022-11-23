@@ -1,0 +1,20 @@
+server:
+  port: 90
+
+datasource:
+  host: "localhost:3306"
+  user: "root"
+  pass: "1234"
+  dbname: "sgp_processor_svc"
+
+paths:
+  getHistorical: "/v1/sgp-data-history-svc/getHistorical"
+  getOneHistorical: "/v1/sgp-data-history-svc/getOneHistorical"
+
+
+app-properties:
+  getHistorical:
+    dateAdmission-Format: '02/01/2006'
+  getPatient:
+    idStatusActive: 1
+    idStatusInactive: 2
