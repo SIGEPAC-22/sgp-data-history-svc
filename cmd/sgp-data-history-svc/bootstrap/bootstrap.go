@@ -15,6 +15,9 @@ import (
 	"sgp-data-history-svc/internal/getHistorical/getHistoricalService"
 	"sgp-data-history-svc/internal/getHistorical/platform/handler"
 	"sgp-data-history-svc/internal/getHistorical/platform/storage/mysql"
+	"sgp-data-history-svc/internal/getOneHistorical/getOneHistoricalService"
+	handler2 "sgp-data-history-svc/internal/getOneHistorical/platform/handler"
+	mysql2 "sgp-data-history-svc/internal/getOneHistorical/platform/storage/mysql"
 	"syscall"
 )
 
@@ -59,7 +62,16 @@ func Run() {
 	getHistoricalHandler := handler.NewHttpGetHistoricalHandler(config.GetString("paths.getHistorical"), getHistoricalEndpoint)
 	//////////////////////GET HISTORICAL////////////////////////////////////////////////
 
+	//////////////////////GET ONE HISTORICAL////////////////////////////////////////////////
+	getOneHistoricalRepo := mysql2.NewGetOneHistoricalRepo(db, kitlogger)
+	getOneHistoricalService := getOneHistoricalService.NewService(getOneHistoricalRepo, kitlogger)
+	getOneHistoricalEndpoint := handler2.MakeGetOneHistoricalEndpoints(getOneHistoricalService)
+	getHistoricalEndpoint = handler2.GetOneHistoricalTransportMiddleware(kitlogger)(getOneHistoricalEndpoint)
+	getOneHistoricalHandler := handler2.NewHttpGetOneHistoricalHandler(config.GetString("paths.getOneHistorical"), getHistoricalEndpoint)
+	//////////////////////GET ONE HISTORICAL////////////////////////////////////////////////
+
 	mux.Handle(config.GetString("paths.getHistorical"), getHistoricalHandler)
+	mux.Handle(config.GetString("paths.getOneHistorical"), getOneHistoricalHandler)
 	mux.Handle("/health", health.NewHandler())
 
 	go func() {

@@ -7,6 +7,7 @@ import (
 	goconfig "github.com/iglin/go-config"
 	"sgp-data-history-svc/internal/getHistorical"
 	"sgp-data-history-svc/kit/constants"
+	"time"
 )
 
 type GetHistoricalRepo struct {
@@ -19,8 +20,10 @@ func NewGetHistoricalRepo(db *sql.DB, log log.Logger) *GetHistoricalRepo {
 }
 
 func (g *GetHistoricalRepo) GetHistoricalRepository(ctx context.Context) ([]getHistorical.GetHistoricalResponse, error) {
+
 	config := goconfig.NewConfig("./application.yaml", goconfig.Yaml)
 	//id := config.GetInt("app-properties.getPatient.idStatusActive")
+
 	rows, errDB := g.db.QueryContext(ctx, "SELECT his_id_patient, hist_id_file_patient, hist_first_name, his_second_name, his_admission_date, his_high_date, his_low_date FROM his_historical;")
 	if errDB != nil {
 		g.log.Log("Error while trying to get information for historical", constants.UUID, ctx.Value(constants.UUID))
@@ -40,12 +43,26 @@ func (g *GetHistoricalRepo) GetHistoricalRepository(ctx context.Context) ([]getH
 			FirstName:     respDB.firstName,
 			LastName:      respDB.lastName,
 			AdmissionDate: respDB.admissionDate.Format(config.GetString("app-properties.getHistorical.dateAdmission-Format")),
-			HighDate:      respDB.highDate.Format(config.GetString("app-properties.getHistorical.dateAdmission-Format")),
-			LowDate:       respDB.lowDate.Format(config.GetString("app-properties.getHistorical.dateAdmission-Format")),
+			HighDate:      transformerPointer(respDB.highDate),
+			LowDate:       transformerPointer(respDB.lowDate),
 		})
 	}
 	if len(resp) == 0 {
 		g.log.Log("Data Not Found", constants.UUID, ctx.Value(constants.UUID))
 	}
 	return resp, nil
+}
+
+func transformerPointer(date *time.Time) string {
+
+	if date != nil {
+		var dateConverter string
+
+		config := goconfig.NewConfig("./application.yaml", goconfig.Yaml)
+		dateConverter = date.Format(config.GetString("app-properties.getHistorical.dateAdmission-Format"))
+		return dateConverter
+	} else {
+		return "not available"
+	}
+
 }
