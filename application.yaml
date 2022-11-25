@@ -1,10 +1,10 @@
 server:
-  port: 90
+  port: 94
 
 datasource:
   host: "localhost:3306"
   user: "root"
-  pass: "12345"
+  pass: "1234"
   dbname: "sgp_processor_svc"
 
 paths:

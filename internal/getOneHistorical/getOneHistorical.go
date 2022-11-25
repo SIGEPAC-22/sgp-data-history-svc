@@ -3,11 +3,11 @@ package getOneHistorical
 import "context"
 
 type Repository interface {
-	GetOneHistoricalRepository(ctx context.Context, id string) ([]GetOneHistoricalResponse, error)
+	GetOneHistoricalRepository(ctx context.Context, id string) (GetOneHistoricalResponse, error)
 }
 
 type Service interface {
-	GetOneHistoricalService(ctx context.Context, id string) ([]GetOneHistoricalResponse, error)
+	GetOneHistoricalService(ctx context.Context, id string) (GetOneHistoricalResponse, error)
 }
 
 type GetOneComorbidityRequest struct {
