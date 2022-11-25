@@ -24,7 +24,7 @@ func (g *GetOneHistoricalRepo) GetOneHistoricalRepository(ctx context.Context, i
 
 	config := goconfig.NewConfig("./application.yaml", goconfig.Yaml)
 
-	rows := g.db.QueryRowContext(ctx, "SELECT his_id_patient, hist_id_file_patient, hist_first_name, his_second_name, his_admission_date, his_high_date, his_low_date FROM his_historical WHERE his_id_patient = ?", id)
+	rows := g.db.QueryRowContext(ctx, "SELECT his_id_patient, his_id_file_patient, his_first_name, his_second_name, his_admission_date, his_high_date, his_low_date FROM his_historical WHERE his_id_patient = ?", id)
 	var respDB SqlGetOneHistorical
 	if err := rows.Scan(&respDB.idPatient, &respDB.idPatientFile, &respDB.firstName, &respDB.lastName, &respDB.admissionDate, &respDB.highDate, &respDB.lowDate); err != nil {
 		g.log.Log("Data not found", "error", err.Error(), constants.UUID, ctx.Value(constants.UUID))

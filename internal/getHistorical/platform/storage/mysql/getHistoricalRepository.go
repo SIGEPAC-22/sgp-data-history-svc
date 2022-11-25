@@ -24,7 +24,7 @@ func (g *GetHistoricalRepo) GetHistoricalRepository(ctx context.Context) ([]getH
 	config := goconfig.NewConfig("./application.yaml", goconfig.Yaml)
 	//id := config.GetInt("app-properties.getPatient.idStatusActive")
 
-	rows, errDB := g.db.QueryContext(ctx, "SELECT his_id_patient, hist_id_file_patient, hist_first_name, his_second_name, his_admission_date, his_high_date, his_low_date FROM his_historical;")
+	rows, errDB := g.db.QueryContext(ctx, "SELECT his_id_patient, his_id_file_patient, his_first_name, his_second_name, his_admission_date, his_high_date, his_low_date FROM his_historical;")
 	if errDB != nil {
 		g.log.Log("Error while trying to get information for historical", constants.UUID, ctx.Value(constants.UUID))
 		return []getHistorical.GetHistoricalResponse{}, errDB
