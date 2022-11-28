@@ -1,10 +1,10 @@
 server:
-  port: 94
+  port: 90
 
 datasource:
-  host: "localhost:3306"
-  user: "root"
-  pass: "12345"
+  host: "sgp-processor-svc.csntzsasnlad.us-east-1.rds.amazonaws.com:3306"
+  user: "sgpprocessorsvc"
+  pass: "test1234"
   dbname: "sgp_processor_svc"
 
 paths:
