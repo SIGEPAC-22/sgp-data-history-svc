@@ -24,7 +24,7 @@ func (g *GetHistoricalRepo) GetHistoricalRepository(ctx context.Context) ([]getH
 	config := goconfig.NewConfig("./application.yaml", goconfig.Yaml)
 	//id := config.GetInt("app-properties.getPatient.idStatusActive")
 
-	rows, errDB := g.db.QueryContext(ctx, "SELECT his_id_patient, his_id_file_patient, his_first_name, his_second_name, his_admission_date, his_high_date, his_low_date FROM his_historical;")
+	rows, errDB := g.db.QueryContext(ctx, "SELECT his_id_patient, his_id_file_patient, concat(his_first_name,' ', his_second_name) as full_name, concat(his_first_last_name,' ', his_second_last_name) as full_last_name, his_admission_date, his_high_date, his_low_date FROM his_historical;")
 	if errDB != nil {
 		g.log.Log("Error while trying to get information for historical", constants.UUID, ctx.Value(constants.UUID))
 		return []getHistorical.GetHistoricalResponse{}, errDB
@@ -33,15 +33,15 @@ func (g *GetHistoricalRepo) GetHistoricalRepository(ctx context.Context) ([]getH
 	var resp []getHistorical.GetHistoricalResponse
 	for rows.Next() {
 		var respDB SqlGetHistorical
-		if err := rows.Scan(&respDB.idPatient, &respDB.idPatientFile, &respDB.firstName, &respDB.lastName, &respDB.admissionDate, &respDB.highDate, &respDB.lowDate); err != nil {
+		if err := rows.Scan(&respDB.idPatient, &respDB.idPatientFile, &respDB.fullName, &respDB.fullLastName, &respDB.admissionDate, &respDB.highDate, &respDB.lowDate); err != nil {
 			g.log.Log("error while trying to scan response from DB", "error", err.Error(), constants.UUID, ctx.Value(constants.UUID))
 			return []getHistorical.GetHistoricalResponse{}, err
 		}
 		resp = append(resp, getHistorical.GetHistoricalResponse{
 			IdPatient:     respDB.idPatient,
 			IdPatientFile: respDB.idPatientFile,
-			FirstName:     respDB.firstName,
-			LastName:      respDB.lastName,
+			FirstName:     respDB.fullName,
+			LastName:      respDB.fullLastName,
 			AdmissionDate: respDB.admissionDate.Format(config.GetString("app-properties.getHistorical.dateAdmission-Format")),
 			HighDate:      transformerPointer(respDB.highDate),
 			LowDate:       transformerPointer(respDB.lowDate),

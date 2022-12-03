@@ -24,17 +24,17 @@ func (g *GetOneHistoricalRepo) GetOneHistoricalRepository(ctx context.Context, i
 
 	config := goconfig.NewConfig("./application.yaml", goconfig.Yaml)
 
-	rows := g.db.QueryRowContext(ctx, "SELECT his_id_patient, his_id_file_patient, his_first_name, his_second_name, his_admission_date, his_high_date, his_low_date FROM his_historical WHERE his_id_patient = ?", id)
+	rows := g.db.QueryRowContext(ctx, "SELECT his_id_patient, his_id_file_patient, concat(his_first_name,' ', his_second_name) as full_name, concat(his_first_last_name,' ', his_second_last_name) as full_last_name, his_admission_date, his_high_date, his_low_date FROM his_historical WHERE his_id_patient = ?", id)
 	var respDB SqlGetOneHistorical
-	if err := rows.Scan(&respDB.idPatient, &respDB.idPatientFile, &respDB.firstName, &respDB.lastName, &respDB.admissionDate, &respDB.highDate, &respDB.lowDate); err != nil {
+	if err := rows.Scan(&respDB.idPatient, &respDB.idPatientFile, &respDB.fullName, &respDB.fullLastName, &respDB.admissionDate, &respDB.highDate, &respDB.lowDate); err != nil {
 		g.log.Log("Data not found", "error", err.Error(), constants.UUID, ctx.Value(constants.UUID))
 		return getOneHistorical.GetOneHistoricalResponse{}, errors.New("Data not found")
 	}
 	resp := getOneHistorical.GetOneHistoricalResponse{
 		IdPatient:     respDB.idPatient,
 		IdPatientFile: respDB.idPatientFile,
-		FirstName:     respDB.firstName,
-		LastName:      respDB.lastName,
+		FirstName:     respDB.fullName,
+		LastName:      respDB.fullLastName,
 		AdmissionDate: respDB.admissionDate.Format(config.GetString("app-properties.getHistorical.dateAdmission-Format")),
 		HighDate:      transformerPointer(respDB.highDate),
 		LowDate:       transformerPointer(respDB.lowDate),
